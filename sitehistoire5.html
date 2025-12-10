@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Histoire Fictive de Guerre France</title>
+
+<style>
+    body {
+        margin: 0;
+        background: url('https://picsum.photos/seed/camo-bg/1600/900') no-repeat center center fixed;
+        background-size: cover;
+        color: #e2e2e2;
+        font-family: Arial, sans-serif;
+    }
+
+    header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 15px 20px;
+        background-color: rgba(0, 0, 0, 0.65);
+        border-bottom: 3px solid #2b3a3a;
+        font-size: 20px;
+        text-transform: uppercase;
+    }
+
+    .left-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    header img {
+        width: 32px;
+        height: 22px;
+        border: 1px solid white;
+    }
+
+    nav a {
+        color: white;
+        text-decoration: none;
+        font-weight: bold;
+        margin-left: 20px;
+    }
+    nav a:hover { text-decoration: underline; }
+
+    .grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+        padding: 20px;
+    }
+
+    .card {
+        background-color: rgba(0, 0, 0, 0.65);
+        padding: 10px;
+        border-radius: 10px;
+        border: 2px solid #3c4c4c;
+        cursor: pointer;
+        transition: transform 0.2s;
+        text-align: center;
+    }
+    .card:hover { transform: scale(1.03); }
+
+    .card img {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+        border-radius: 8px;
+        border: 2px solid #3c4c4c;
+        background: #222;
+    }
+
+    .fav-btn {
+        margin-top: 10px;
+        padding: 6px 10px;
+        border: none;
+        cursor: pointer;
+        border-radius: 6px;
+        background-color: #314e31;
+        color: white;
+        font-weight: bold;
+    }
+    .fav-btn.active { background-color: #5cb85c; }
+
+    #details {
+        padding: 20px;
+        display: none;
+        background-color: rgba(0,0,0,0.8);
+    }
+
+    #details img {
+        width: 60%;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        border: 2px solid #3c4c4c;
+    }
+
+    #backBtn {
+        margin-bottom: 20px;
+        cursor: pointer;
+        padding: 8px 14px;
+        font-weight: bold;
+        border: none;
+        border-radius: 6px;
+        background-color: #344444;
+        color: white;
+    }
+
+    /* Radar */
+    #radar {
+        position: fixed;
+        right: 20px;
+        bottom: 20px;
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        border: 2px solid #1aff1a;
+        box-shadow: 0 0 15px #1aff1a;
+        overflow: hidden;
+    }
+
+    #radar-sweep {
+        width: 100%;
+        height: 100%;
+        background: conic-gradient(rgba(0,0,0,0) 0deg, #1aff1a 60deg, rgba(0,0,0,0) 120deg);
+        animation: sweep 2.5s linear infinite;
+    }
+
+    @keyframes sweep {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+
+    /* responsive adjustments */
+    @media (max-width: 900px) {
+      .grid { grid-template-columns: repeat(2, 1fr); }
+      #details img { width: 90%; }
+    }
+    @media (max-width: 600px) {
+      .grid { grid-template-columns: 1fr; }
+    }
+</style>
+</head>
+
+<body>
+<header>
+    <div class="left-header">
+        <span>histoirefictivedeguerrefrance</span>
+        <img src="https://flagcdn.com/w320/fr.png" alt="Drapeau" />
+    </div>
+    <nav>
+        <a href="#" onclick="renderMain(); return false;">Accueil</a>
+        <a href="#" onclick="showFavoris(); return false;">Favoris</a>
+    </nav>
+</header>
+
+<audio autoplay loop>
+    <source src="https://cdn.pixabay.com/audio/2022/03/15/audio_2b3f4b2bb9.mp3" type="audio/mpeg">
+</audio>
+
+<div id="main" class="grid"></div>
+<div id="details">
+    <button id="backBtn">Retour</button>
+    <h2 id="storyTitle"></h2>
+    <img id="storyImg" alt="Image histoire">
+    <div id="storyContent" style="white-space: pre-line; line-height: 1.5;"></div>
+</div>
+
+<div id="radar"><div id="radar-sweep"></div></div>
+
+<script>
+/*
+  J'ai remplacé toutes les images par des images Picsum (serveur stable).
+  Chaque seed donne une image différente et thématique approximative.
+*/
+const stories = [
+    {
+        id: 1,
+        title: "La Colline de Fer",
+        img: "https://picsum.photos/seed/colline/1200/800",
+        text: `1. L'aube rouge éclairait la colline, comme une blessure à vif.
+2. Les soldats avançaient en silence, le pas lourd et mesuré.
+3. Les obus récents laissaient des cratères imprégnés d'odeur métallique.
+4. Adrien serrait son fusil, sentant chaque battement de son cœur.
+5. Autour de lui, les camarades formaient une chaîne fragile.
+6. Une fumée fine montait, cachant partiellement le village en bas.
+7. On distinguait des silhouettes qui demeuraient immobiles, comme figées.
+8. Un ordre chuchoté rompit la monotonie du vent.
+9. Des rafales lointaines firent vibrer l'air et soulevèrent la poussière.
+10. Adrien ramassa un morceau de métal corrodé, souvenir d’un blindé.
+11. Il pensa à sa sœur qui attendait au loin, aux lettres jamais reçues.
+12. Le groupe contourna un cratère, ignorant la peur qui sourdait.
+13. Une grenade tomba, projetant des éclats autour d’eux.
+14. Les ombres s'étirèrent, puis se dissipèrent dans la fumée.
+15. Adrien sentit la fatigue soudaine, mais continua d’avancer.
+16. Le commandant fit signe de progresser encore de quelques centaines de mètres.
+17. La colline semblait interminable, chaque pas coûtait cher.
+18. L’aube prit finalement la forme d’un soleil blafard.
+19. Au sommet, ils observèrent le champ de bataille, lourd de silences.
+20. Adrien sut que cette matinée resterait gravée dans sa mémoire à jamais.`
+    },
+    {
+        id: 2,
+        title: "Les Loups du Nord",
+        img: "https://picsum.photos/seed/loupsnorth/1200/800",
+        text: `1. Dans le froid du nord, la forêt se faisait mur silencieux.
+2. Les branches ployaient sous le poids de la neige fraîche.
+3. L’unité progressait à pas feutrés, camouflée par le blanc.
+4. Le commandant Ravel consultait sa carte, les doigts engourdis.
+5. Le souffle des hommes formait de petites volutes dans l’air glacé.
+6. Soudain une radio cracha un message bref et alarmant.
+7. Les yeux se tournèrent vers l’est, là où des traces fraîches apparaissaient.
+8. Une colonne ennemie avançait lentement le long d’une piste.
+9. Ravel ordonna l’improvisation d’une embuscade parfaite.
+10. Les soldats se positionnèrent, comme des loups dans l’attente.
+11. Lorsque le convoi arriva, la forêt retentit d’un rugissement d’acier.
+12. Les charges explosèrent, stoppant les véhicules net.
+13. Des flammes éclairèrent la neige, rouge sur blanc immaculé.
+14. Les tirs durèrent l’espace de quelques minutes fulgurantes.
+15. Puis la vallée replongea dans un silence presque irréel.
+16. Les hommes fouillèrent les décombres à la recherche d’intel.
+17. Ravel trouva des papiers qui changeaient le cours de la mission.
+18. Ils rassemblèrent ce qu’ils purent et disparurent dans les bois.
+19. La forêt reprit son souffle, comme si rien ne s’était produit.
+20. Au loin, un loup hurla, et les hommes continuèrent leur route.`
+    },
+    {
+        id: 3,
+        title: "L'Ombre des Ruines",
+        img: "https://picsum.photos/seed/ruines/1200/800",
+        text: `1. La ville n’était plus que pierres noircies et fer tordu.
+2. Des fenêtres béantes regardaient comme des orbites vides.
+3. Marc progressait lentement, chaque pas éveillant des souvenirs.
+4. Des murs effondrés formaient des labyrinthes de poussière.
+5. Une odeur âcre de fumée collait encore aux vêtements.
+6. Il scrutait les ombres à la recherche de survivants.
+7. Une voix étouffée lui parvint depuis un sous-sol en ruine.
+8. Marc descendit prudemment, les mains tremblantes.
+9. Il découvrit une mère serrant son enfant contre elle.
+10. Avec effort, il les aida à remonter hors du piège.
+11. Les avions de reconnaissance tournoyaient au loin, silhouettes menaçantes.
+12. Une sirène mourante se fit entendre au-delà des décombres.
+13. Marc offrit son manteau à l’enfant, geste simple et nécessaire.
+14. La mère pleura en silence, soulagée et brisée à la fois.
+15. L’équipe reprit la route, chaque membre portant son lot d’images.
+16. On ramassa des carnets, des photos et des traces de vies passées.
+17. La nuit, les ruines prirent une autre forme, presque vivante.
+18. Marc s’arrêta, posa une main sur une pierre tiède.
+19. Il pria pour que ces ombres laissent place à quelque chose de meilleur.
+20. En partant, il laissa une petite croix gravée sur un mur fissuré.`
+    },
+    {
+        id: 4,
+        title: "Le Pont de Minuit",
+        img: "https://picsum.photos/seed/pontminuit/1200/800",
+        text: `1. Le pont, vieux et fragile, traversait une rivière paisible autrefois.
+2. Ce soir-là, la brume tombait et rendait tout indistinct.
+3. L’unité s’était postée aux abords, guettant les mouvements ennemis.
+4. Émile observa l’horizon à travers sa lunette terne.
+5. Les phares d’un convoi apparurent comme des yeux lointains.
+6. Le signal fut donné, silencieux et précis.
+7. Les charges furent déposées à intervalles réguliers.
+8. L’attente fut longue, peuplée d’ombres et de souvenirs.
+9. Puis les moteurs se rapprochèrent, mécaniques et massifs.
+10. Une étincelle, suivie d’un fracas, brisa le calme de la nuit.
+11. Le pont vibra, se fendit et craqua sous la pression.
+12. L’eau jaillit en geysers, projetant des débris ici et là.
+13. Les véhicules ennemis furent stoppés, projetés dans le courant.
+14. Les silhouettes flottèrent un instant, puis disparurent sous la surface.
+15. Émile resta immobile, le visage marqué par l’effort.
+16. Le pont s’effondra, emportant avec lui les traces du passage.
+17. La mission avait été accomplie, mais au prix d’une lourde tension.
+18. Ils se replièrent en silence, laissant la rivière reprendre sa course.
+19. Sur la berge, on compta les absents et on pansait les plaies.
+20. Au matin, le pont n’était plus qu’un souvenir englouti.`
+    },
+    {
+        id: 5,
+        title: "Les Tambours de l'Est",
+        img: "https://picsum.photos/seed/tamboursest/1200/800",
+        text: `1. L'aube à l'est se levait sur des lignes immenses.
+2. Les colonnes d’acier roulaient sur la plaine humide.
+3. Les tambours de guerre semblaient battre dans le cœur des hommes.
+4. Paul regardait l'horizon, serrant la carte chiffonnée.
+5. Les drones zébraient le ciel, envoyant des images en temps réel.
+6. L’artillerie se positionna, massive et silencieuse.
+7. Un ordre fut murmuré dans le vent matinal.
+8. Les premiers obus partirent, marquant le début de l’assaut.
+9. Le sol se creusa, soulevant nuages et éclats.
+10. Paul courut, protégeant ses camarades comme il put.
+11. Le vacarme était assourdissant, presque irréel.
+12. Des colonnes de fumée montèrent en spirales grises.
+13. Les fusils crépitaient, dessinant des trajectoires lumineuses.
+14. On chercha les blessés, on porta secours en hâte.
+15. Les objets du quotidien jonchaient désormais le sol bouleversé.
+16. L’assaut semblait interminable, pourtant il évoluait.
+17. À la fin, la plaine respirait difficilement, recouverte de traces.
+18. Les tambours se turent peu à peu, mais leur écho resta.
+19. Paul s’assit, épuisé, et regarda le ciel qui s’éclaircissait.
+20. Il savait que demain, d’autres tambours pourraient retentir.`
+    },
+    {
+        id: 6,
+        title: "Dernier Feu",
+        img: "https://picsum.photos/seed/dernierfeu/1200/800",
+        text: `1. La nuit était tombée, lourde et sans étoiles.
+2. Le dernier feu du camp jetait des ombres vacillantes.
+3. Les soldats se rassemblaient pour un bref repos.
+4. Louis regardait les braises, perdu dans ses pensées.
+5. Demain, ils reprendraient la route vers l’inconnu.
+6. Une alerte électrique vint briser la quiétude.
+7. Les hommes se levèrent, disciplinés et rapides.
+8. Le front était à quelques kilomètres encore.
+9. Les premiers échanges de tirs se firent entendre, sourds.
+10. Louis se posta derrière un rocher, le souffle court.
+11. Des silhouettes se dessinaient à la lisière des arbres.
+12. Le combat fut bref, violent, sans fioritures.
+13. Des fusées éclairantes déchirèrent la nuit noire.
+14. À l’aube, on compta les pertes, on recensa les survivants.
+15. Le dernier feu s’éteignit, emportant avec lui quelques histoires.
+16. Louis prit une photo d’un camarade, comme une relique.
+17. Ils reprirent la marche, les poches pleines de souvenirs lourds.
+18. Parfois, on entendait encore le crépitement lointain d’un feu.
+19. Le monde semblait à la fois plus grand et plus fragile.
+20. Louis sut que la paix serait un combat différent, mais nécessaire.`
+    }
+];
+
+let favoris = JSON.parse(localStorage.getItem("favoris")) || [];
+
+function renderMain(list = stories) {
+    document.getElementById("details").style.display = "none";
+    const main = document.getElementById("main");
+    main.style.display = "grid";
+    main.innerHTML = "";
+
+    list.forEach(story => {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.innerHTML = `
+            <img src="${story.img}" alt="${story.title}">
+            <h3>${story.title}</h3>
+            <button class="fav-btn ${favoris.includes(story.id) ? 'active' : ''}" onclick="toggleFavoris(${story.id}); event.stopPropagation();">❤ Favori</button>
+        `;
+        card.onclick = () => showStory(story.id);
+        main.appendChild(card);
+    });
+}
+
+function showStory(id) {
+    const story = stories.find(s => s.id === id);
+    document.getElementById("main").style.display = "none";
+    document.getElementById("details").style.display = "block";
+
+    document.getElementById("storyTitle").innerText = story.title;
+    document.getElementById("storyImg").src = story.img;
+    document.getElementById("storyContent").innerText = story.text;
+}
+
+function toggleFavoris(id) {
+    if (favoris.includes(id)) favoris = favoris.filter(f => f !== id);
+    else favoris.push(id);
+
+    localStorage.setItem("favoris", JSON.stringify(favoris));
+    renderMain();
+}
+
+function showFavoris() {
+    const filtres = stories.filter(s => favoris.includes(s.id));
+    renderMain(filtres);
+}
+
+document.getElementById("backBtn").onclick = () => renderMain();
+
+renderMain();
+</script>
+
+</body>
+</html>
