@@ -6,34 +6,42 @@
 <title>Histoire Fictive de Guerre France</title>
 
 <style>
+    /* --- Général / Couleurs --- */
     body {
         margin: 0;
         background: url('https://picsum.photos/seed/camo-bg/1600/900') no-repeat center center fixed;
         background-size: cover;
         color: #e2e2e2;
-        font-family: Arial, sans-serif;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.6;
     }
 
+    /* --- En-tête (Header) --- */
     header {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: 15px 20px;
-        background-color: rgba(0, 0, 0, 0.65);
-        border-bottom: 3px solid #2b3a3a;
-        font-size: 20px;
+        padding: 10px 15px; /* Optimisé pour mobile */
+        background-color: rgba(0, 0, 0, 0.75); /* Plus opaque pour la lisibilité */
+        border-bottom: 3px solid #3d5050;
+        font-size: 16px; /* Réduit pour mobile */
         text-transform: uppercase;
+        position: sticky;
+        top: 0;
+        z-index: 1000;
     }
 
     .left-header {
         display: flex;
         align-items: center;
-        gap: 12px;
+        gap: 8px;
+        font-weight: bold;
+        white-space: nowrap; /* Empêche le titre de se couper */
     }
 
     header img {
-        width: 32px;
-        height: 22px;
+        width: 24px; /* Plus petit */
+        height: 16px;
         border: 1px solid white;
     }
 
@@ -41,118 +49,158 @@
         color: white;
         text-decoration: none;
         font-weight: bold;
-        margin-left: 20px;
+        margin-left: 15px;
+        transition: color 0.3s;
     }
-    nav a:hover { text-decoration: underline; }
+    nav a:hover { color: #aaa; text-decoration: underline; }
 
+    /* --- Grille des Cartes (Main Grid) --- */
     .grid {
         display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 20px;
-        padding: 20px;
+        grid-template-columns: 1fr; /* Une seule colonne par défaut pour mobile */
+        gap: 15px; /* Espacement réduit */
+        padding: 15px;
     }
 
     .card {
-        background-color: rgba(0, 0, 0, 0.65);
-        padding: 10px;
-        border-radius: 10px;
-        border: 2px solid #3c4c4c;
+        background-color: rgba(0, 0, 0, 0.7);
+        padding: 15px;
+        border-radius: 12px;
+        border: 2px solid #556b6b;
         cursor: pointer;
-        transition: transform 0.2s;
+        transition: transform 0.2s, box-shadow 0.2s;
         text-align: center;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
     }
-    .card:hover { transform: scale(1.03); }
+    .card:hover { 
+        transform: scale(1.02); 
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.5);
+    }
 
+    .card h3 {
+        margin-top: 10px;
+        margin-bottom: 5px;
+        font-size: 1.1em;
+    }
+    
     .card img {
         width: 100%;
-        height: 200px;
+        max-height: 150px; /* Hauteur fixe pour l'homogénéité */
         object-fit: cover;
         border-radius: 8px;
-        border: 2px solid #3c4c4c;
-        background: #222;
+        border: 2px solid #556b6b;
     }
 
     .fav-btn {
-        margin-top: 10px;
-        padding: 6px 10px;
+        margin-top: 8px;
+        padding: 8px 12px;
         border: none;
         cursor: pointer;
         border-radius: 6px;
-        background-color: #314e31;
+        background-color: #4a6c4a;
         color: white;
         font-weight: bold;
+        transition: background-color 0.2s;
+        width: 100%; /* Pleine largeur sur mobile */
+        box-sizing: border-box;
     }
-    .fav-btn.active { background-color: #5cb85c; }
+    .fav-btn.active { background-color: #4CAF50; }
+    .fav-btn:hover { opacity: 0.9; }
+
+    /* --- Affichage des Détails (Details View) --- */
+    #details {
+        padding: 15px;
+        display: none;
+        background-color: rgba(0,0,0,0.9);
+        min-height: 100vh; /* S'assure que la section couvre au moins toute la hauteur */
+        text-align: center;
+    }
+
+    #details h2 {
+        margin-top: 10px;
+        margin-bottom: 15px;
+        font-size: 1.5em;
+    }
+
+    #details img {
+        width: 90%; /* Prend plus de place sur mobile */
+        max-width: 400px;
+        border-radius: 10px;
+        margin-bottom: 15px;
+        border: 2px solid #556b6b;
+    }
+
+    #storyContent {
+        text-align: left;
+        padding: 10px;
+        background-color: rgba(255, 255, 255, 0.05);
+        border-radius: 8px;
+        margin-top: 15px;
+        font-size: 0.95em;
+    }
+
+    #backBtn {
+        margin-bottom: 15px;
+        cursor: pointer;
+        padding: 10px 18px;
+        font-weight: bold;
+        border: none;
+        border-radius: 6px;
+        background-color: #455a64;
+        color: white;
+        transition: background-color 0.2s;
+    }
+    #backBtn:hover { background-color: #546e7a; }
+
 
     /* --- Notation par Étoiles --- */
     .rating-display {
         color: gold;
         margin-top: 5px;
-        font-size: 1.2em;
+        font-size: 1em; /* Taille réduite sur carte */
+        font-weight: bold;
+        margin-bottom: 10px;
     }
     .star-rating {
         display: inline-block;
-        font-size: 2em;
+        font-size: 1.8em; /* Taille adaptée pour l'interactivité mobile */
         unicode-bidi: bidi-override;
         direction: rtl;
         text-align: center;
-        margin-bottom: 20px;
+        margin-bottom: 10px;
     }
     .star-rating > span {
         display: inline-block;
         position: relative;
         width: 1.1em;
         cursor: pointer;
-        color: #555; /* Étoiles non notées */
+        color: #777;
     }
     .star-rating > span:hover:before,
     .star-rating > span:hover ~ span:before,
     .star-rating > span.rated:before,
     .star-rating > span.rated ~ span:before {
-        content: "\2605"; /* Étoile pleine */
+        content: "\2605";
         position: absolute;
         color: gold;
     }
     .star-rating > span:before {
-        content: "\2606"; /* Étoile vide */
+        content: "\2606";
     }
     /* --- Fin Notation par Étoiles --- */
 
-    #details {
-        padding: 20px;
-        display: none;
-        background-color: rgba(0,0,0,0.8);
-    }
-
-    #details img {
-        width: 60%;
-        border-radius: 10px;
-        margin-bottom: 20px;
-        border: 2px solid #3c4c4c;
-    }
-
-    #backBtn {
-        margin-bottom: 20px;
-        cursor: pointer;
-        padding: 8px 14px;
-        font-weight: bold;
-        border: none;
-        border-radius: 6px;
-        background-color: #344444;
-        color: white;
-    }
-
-    /* Radar */
+    /* --- Radar (Fixe) --- */
     #radar {
         position: fixed;
-        right: 20px;
-        bottom: 20px;
-        width: 120px;
-        height: 120px;
+        right: 15px; /* Marge réduite */
+        bottom: 15px;
+        width: 80px; /* Plus petit */
+        height: 80px;
         border-radius: 50%;
         border: 2px solid #1aff1a;
-        box-shadow: 0 0 15px #1aff1a;
+        box-shadow: 0 0 10px #1aff1a;
         overflow: hidden;
+        z-index: 100;
     }
 
     #radar-sweep {
@@ -167,13 +215,34 @@
         to { transform: rotate(360deg); }
     }
 
-    /* responsive adjustments */
-    @media (max-width: 900px) {
-      .grid { grid-template-columns: repeat(2, 1fr); }
-      #details img { width: 90%; }
+    /* --- Ajustements Responsive pour Écrans plus Larges (Tablettes/PC) --- */
+    @media (min-width: 600px) {
+      .grid { 
+          grid-template-columns: repeat(2, 1fr); 
+          gap: 20px;
+          padding: 20px;
+      }
+      header {
+          padding: 15px 20px;
+          font-size: 20px;
+      }
+      .card img {
+          max-height: 200px;
+      }
+      #details img { 
+          width: 60%; 
+          max-width: none;
+      }
+      #radar {
+          width: 120px;
+          height: 120px;
+          right: 20px;
+          bottom: 20px;
+      }
     }
-    @media (max-width: 600px) {
-      .grid { grid-template-columns: 1fr; }
+
+    @media (min-width: 900px) {
+      .grid { grid-template-columns: repeat(3, 1fr); }
     }
 </style>
 </head>
@@ -211,8 +280,9 @@
 
 <script>
 /*
-  J'ai remplacé toutes les images par des images Picsum (serveur stable).
-  Chaque seed donne une image différente et thématique approximative.
+  J'ai conservé toutes les données et la logique de l'exercice précédent.
+  La fonction renderMain() gère l'affichage des notes moyennes et des favoris.
+  La fonction showStory() gère l'affichage des étoiles de notation interactive.
 */
 const stories = [
     {
@@ -231,7 +301,7 @@ const stories = [
         id: 3,
         title: "L'Ombre des Ruines",
         img: "https://picsum.photos/seed/ruines/1200/800",
-        text: "1. La ville n’était plus que pierres noircies et fer tordu.2. Des fenêtres béantes regardaient comme des orbites vides.\n3. Marc progressait lentement, chaque pas éveillant des souvenirs.\n4. Des murs effondrés formaient des labyrinthes de poussière.\n5. Une odeur âcre de fumée collait encore aux vêtements.\n6. Il scrutait les ombres à la recherche de survivants.\n7. Une voix étouffée lui parvint depuis un sous-sol en ruine.\n8. Marc descendit prudemment, les mains tremblantes.\n9. Il découvrit une mère serrant son enfant contre elle.\n10. Avec effort, il les aida à remonter hors du piège.\n11. Les avions de reconnaissance tournoyaient au loin, silhouettes menaçantes.\n12. Une sirène mourante se fait entendre au-delà des décombres.\n13. Marc offrit son manteau à l’enfant, geste simple et nécessaire.\n14. La mère pleura en silence, soulagée et brisée à la fois.\n15. L’équipe reprit la route, chaque membre portant son lot d’images.\n16. On ramassa des carnets, des photos et des traces de vies passées.\n17. La nuit, les ruines prirent une autre forme, presque vivante.\n18. Marc s’arrêta, posa une main sur une pierre tiède.\n19. Il pria pour que ces ombres laissent place à quelque chose de meilleur.\n20. En partant, il laissa une petite croix gravée sur un mur fissuré."
+        text: "1. La ville n’était plus que pierres noircies et fer tordu.2. Des fenêtres béantes regardaient comme des orbites vides.\n3. Marc progressait lentement, chaque pas éveillant des souvenirs.\n4. Des murs effondrés formaient des labyrinthes de poussière.\n5. Une odeur âcre de fumée collait encore aux vêtements.\n6. Il scrutait les ombres à la recherche de survivants.\n7. Une voix étouffée lui parvint depuis un sous-sol en ruine.\n8. Marc descendit prudemment, les mains tremblantes.\n9. Il découvrit une mère serrant son enfant contre elle.\n10. Avec effort, il les aida à remonter hors du piège.\n11. Les avions de reconnaissance tournoyaient au loin, silhouettes menaçantes.\n12. Une sirène mourante se fit entendre au-delà des décombres.\n13. Marc offrit son manteau à l’enfant, geste simple et nécessaire.\n14. La mère pleura en silence, soulagée et brisée à la fois.\n15. L’équipe reprit la route, chaque membre portant son lot d’images.\n16. On ramassa des carnets, des photos et des traces de vies passées.\n17. La nuit, les ruines prirent une autre forme, presque vivante.\n18. Marc s’arrêta, posa une main sur une pierre tiède.\n19. Il pria pour que ces ombres laissent place à quelque chose de meilleur.\n20. En partant, il laissa une petite croix gravée sur un mur fissuré."
     },
     {
         id: 4,
@@ -291,7 +361,7 @@ function renderStars(storyId, containerId, userRating = 0) {
         span.title = i + " étoiles";
         span.onclick = () => setRating(storyId, i);
 
-        // Si l'utilisateur a noté, ou si on est dans l'affichage de la note moyenne
+        // Si l'utilisateur a noté, le style 'rated' est appliqué
         if (i <= userRating) {
             span.classList.add('rated');
         }
@@ -301,29 +371,24 @@ function renderStars(storyId, containerId, userRating = 0) {
 }
 
 function setRating(storyId, value) {
-    // Dans ce système simplifié, on simule l'enregistrement de l'unique note de l'utilisateur
-    // En pratique, il faudrait un système d'authentification pour gérer les notes de plusieurs utilisateurs.
-    // Ici, nous faisons l'hypothèse simplifiée qu'une seule note est enregistrée.
-    
-    // Si l'histoire n'a pas encore de notes, initialiser le tableau
+    // Stockage simplifié de la note utilisateur
     if (!ratings[storyId]) {
         ratings[storyId] = [];
     }
     
-    // Pour cet exemple, on remplace simplement la note précédente de 'cet utilisateur'
-    // En vrai, il faudrait stocker {userId: rating}
+    // Remplacement de la seule note pour simuler l'utilisateur unique
     ratings[storyId][0] = value; 
     
     saveRatings();
     
-    // Mettre à jour l'affichage dans la page de détails et la page principale
+    // Mettre à jour l'affichage
     renderStars(storyId, 'ratingStars', value);
     renderMain();
 }
 
 
 function renderMain(list = stories) {
-    loadRatings(); // S'assurer que les notations sont chargées
+    loadRatings();
     document.getElementById("details").style.display = "none";
     const main = document.getElementById("main");
     main.style.display = "grid";
@@ -337,7 +402,7 @@ function renderMain(list = stories) {
             <img src="${story.img}" alt="${story.title}">
             <h3>${story.title}</h3>
             <div class="rating-display">
-                ${avgRating > 0 ? '⭐' + avgRating : 'Pas encore noté'}
+                ${avgRating > 0 ? '⭐ ' + avgRating + ' / 5' : 'Pas encore noté'}
             </div>
             <button class="fav-btn ${favoris.includes(story.id) ? 'active' : ''}" onclick="toggleFavoris(${story.id}); event.stopPropagation();">❤ Favori</button>
         `;
@@ -355,7 +420,7 @@ function showStory(id) {
     document.getElementById("storyImg").src = story.img;
     document.getElementById("storyContent").innerText = story.text;
     
-    // Afficher la note de l'utilisateur pour cette histoire (simplifié pour un seul utilisateur)
+    // Afficher la note de l'utilisateur pour cette histoire
     const userRating = ratings[id] ? ratings[id][0] : 0; 
     renderStars(id, 'ratingStars', userRating);
 }
@@ -375,10 +440,9 @@ function showFavoris() {
 
 document.getElementById("backBtn").onclick = () => renderMain();
 
-loadRatings(); // Charger les notes au démarrage
+loadRatings();
 renderMain();
 </script>
 
 </body>
 </html>
-
