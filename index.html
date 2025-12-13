@@ -21,14 +21,16 @@
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: 10px 15px; /* Optimisé pour mobile */
-        background-color: rgba(0, 0, 0, 0.75); /* Plus opaque pour la lisibilité */
+        padding: 10px 15px;
+        background-color: rgba(0, 0, 0, 0.75);
         border-bottom: 3px solid #3d5050;
-        font-size: 16px; /* Réduit pour mobile */
+        font-size: 16px;
         text-transform: uppercase;
         position: sticky;
         top: 0;
         z-index: 1000;
+        /* Ajout de Flex-wrap pour éviter le débordement si nécessaire (bien que géré par media query) */
+        flex-wrap: nowrap; 
     }
 
     .left-header {
@@ -36,29 +38,43 @@
         align-items: center;
         gap: 8px;
         font-weight: bold;
-        white-space: nowrap; /* Empêche le titre de se couper */
+        flex-shrink: 1; /* Permet de réduire si l'espace est limité */
     }
 
+    /* MEDIA QUERY CRITIQUE: Masquer le titre sur très petit écran pour prioriser la navigation */
+    @media (max-width: 400px) {
+        .left-header span {
+            display: none; 
+        }
+    }
+    
     header img {
-        width: 24px; /* Plus petit */
+        width: 24px;
         height: 16px;
         border: 1px solid white;
+    }
+
+    nav {
+        flex-shrink: 0; /* Empêche la navigation de se réduire */
     }
 
     nav a {
         color: white;
         text-decoration: none;
         font-weight: bold;
-        margin-left: 15px;
+        margin-left: 10px; /* Réduit l'espace entre les liens */
+        padding: 5px 0; /* Ajout d'un peu de padding vertical pour le toucher */
         transition: color 0.3s;
+        font-size: 0.9em; /* Légèrement plus petit pour gagner de la place */
+        white-space: nowrap;
     }
     nav a:hover { color: #aaa; text-decoration: underline; }
 
     /* --- Grille des Cartes (Main Grid) --- */
     .grid {
         display: grid;
-        grid-template-columns: 1fr; /* Une seule colonne par défaut pour mobile */
-        gap: 15px; /* Espacement réduit */
+        grid-template-columns: 1fr;
+        gap: 15px;
         padding: 15px;
     }
 
@@ -85,7 +101,7 @@
     
     .card img {
         width: 100%;
-        max-height: 150px; /* Hauteur fixe pour l'homogénéité */
+        max-height: 150px;
         object-fit: cover;
         border-radius: 8px;
         border: 2px solid #556b6b;
@@ -101,7 +117,7 @@
         color: white;
         font-weight: bold;
         transition: background-color 0.2s;
-        width: 100%; /* Pleine largeur sur mobile */
+        width: 100%;
         box-sizing: border-box;
     }
     .fav-btn.active { background-color: #4CAF50; }
@@ -112,7 +128,7 @@
         padding: 15px;
         display: none;
         background-color: rgba(0,0,0,0.9);
-        min-height: 100vh; /* S'assure que la section couvre au moins toute la hauteur */
+        min-height: 100vh;
         text-align: center;
     }
 
@@ -123,7 +139,7 @@
     }
 
     #details img {
-        width: 90%; /* Prend plus de place sur mobile */
+        width: 90%;
         max-width: 400px;
         border-radius: 10px;
         margin-bottom: 15px;
@@ -157,13 +173,13 @@
     .rating-display {
         color: gold;
         margin-top: 5px;
-        font-size: 1em; /* Taille réduite sur carte */
+        font-size: 1em;
         font-weight: bold;
         margin-bottom: 10px;
     }
     .star-rating {
         display: inline-block;
-        font-size: 1.8em; /* Taille adaptée pour l'interactivité mobile */
+        font-size: 1.8em;
         unicode-bidi: bidi-override;
         direction: rtl;
         text-align: center;
@@ -192,9 +208,9 @@
     /* --- Radar (Fixe) --- */
     #radar {
         position: fixed;
-        right: 15px; /* Marge réduite */
+        right: 15px;
         bottom: 15px;
-        width: 80px; /* Plus petit */
+        width: 80px;
         height: 80px;
         border-radius: 50%;
         border: 2px solid #1aff1a;
@@ -226,6 +242,9 @@
           padding: 15px 20px;
           font-size: 20px;
       }
+      .left-header span {
+          display: inline; /* Rétablir le titre sur les écrans plus larges */
+      }
       .card img {
           max-height: 200px;
       }
@@ -238,6 +257,10 @@
           height: 120px;
           right: 20px;
           bottom: 20px;
+      }
+      nav a {
+          margin-left: 20px;
+          font-size: 1em;
       }
     }
 
@@ -279,11 +302,6 @@
 <div id="radar"><div id="radar-sweep"></div></div>
 
 <script>
-/*
-  J'ai conservé toutes les données et la logique de l'exercice précédent.
-  La fonction renderMain() gère l'affichage des notes moyennes et des favoris.
-  La fonction showStory() gère l'affichage des étoiles de notation interactive.
-*/
 const stories = [
     {
         id: 1,
@@ -324,7 +342,6 @@ const stories = [
 ];
 
 let favoris = JSON.parse(localStorage.getItem("favoris")) || [];
-// ratings: { storyId: [note1, note2, ...], 2: [5], ... }
 let ratings = {};
 
 function loadRatings() {
@@ -347,21 +364,19 @@ function getAverageRating(storyId) {
     const storyRatings = ratings[storyId] || [];
     if (storyRatings.length === 0) return 0;
     const sum = storyRatings.reduce((acc, curr) => acc + curr, 0);
-    return (sum / storyRatings.length).toFixed(1); // Retourne une moyenne avec une décimale
+    return (sum / storyRatings.length).toFixed(1);
 }
 
 function renderStars(storyId, containerId, userRating = 0) {
     const container = document.getElementById(containerId);
     container.innerHTML = "";
     
-    // Pour une notation de 5 étoiles (indice de 5 à 1 pour la direction RTL)
     for (let i = 5; i >= 1; i--) {
         const span = document.createElement("span");
         span.dataset.value = i;
         span.title = i + " étoiles";
         span.onclick = () => setRating(storyId, i);
 
-        // Si l'utilisateur a noté, le style 'rated' est appliqué
         if (i <= userRating) {
             span.classList.add('rated');
         }
@@ -371,17 +386,14 @@ function renderStars(storyId, containerId, userRating = 0) {
 }
 
 function setRating(storyId, value) {
-    // Stockage simplifié de la note utilisateur
     if (!ratings[storyId]) {
         ratings[storyId] = [];
     }
     
-    // Remplacement de la seule note pour simuler l'utilisateur unique
     ratings[storyId][0] = value; 
     
     saveRatings();
     
-    // Mettre à jour l'affichage
     renderStars(storyId, 'ratingStars', value);
     renderMain();
 }
@@ -420,7 +432,6 @@ function showStory(id) {
     document.getElementById("storyImg").src = story.img;
     document.getElementById("storyContent").innerText = story.text;
     
-    // Afficher la note de l'utilisateur pour cette histoire
     const userRating = ratings[id] ? ratings[id][0] : 0; 
     renderStars(id, 'ratingStars', userRating);
 }
@@ -446,3 +457,4 @@ renderMain();
 
 </body>
 </html>
+
