@@ -29,8 +29,7 @@
         position: sticky;
         top: 0;
         z-index: 1000;
-        /* Ajout de Flex-wrap pour éviter le débordement si nécessaire (bien que géré par media query) */
-        flex-wrap: nowrap; 
+        flex-wrap: nowrap;
     }
 
     .left-header {
@@ -38,13 +37,13 @@
         align-items: center;
         gap: 8px;
         font-weight: bold;
-        flex-shrink: 1; /* Permet de réduire si l'espace est limité */
+        flex-shrink: 1;
     }
 
     /* MEDIA QUERY CRITIQUE: Masquer le titre sur très petit écran pour prioriser la navigation */
     @media (max-width: 400px) {
         .left-header span {
-            display: none; 
+            display: none;
         }
     }
     
@@ -55,17 +54,17 @@
     }
 
     nav {
-        flex-shrink: 0; /* Empêche la navigation de se réduire */
+        flex-shrink: 0;
     }
 
     nav a {
         color: white;
         text-decoration: none;
         font-weight: bold;
-        margin-left: 10px; /* Réduit l'espace entre les liens */
-        padding: 5px 0; /* Ajout d'un peu de padding vertical pour le toucher */
+        margin-left: 10px;
+        padding: 5px 0;
         transition: color 0.3s;
-        font-size: 0.9em; /* Légèrement plus petit pour gagner de la place */
+        font-size: 0.9em;
         white-space: nowrap;
     }
     nav a:hover { color: #aaa; text-decoration: underline; }
@@ -203,6 +202,16 @@
     .star-rating > span:before {
         content: "\2606";
     }
+
+    #details-rating-info {
+        margin-bottom: 20px;
+        padding: 10px;
+        border: 1px dashed #555;
+        border-radius: 8px;
+        display: inline-block;
+        color: #ccc;
+    }
+    #details-rating-info strong { color: gold; }
     /* --- Fin Notation par Étoiles --- */
 
     /* --- Radar (Fixe) --- */
@@ -243,7 +252,7 @@
           font-size: 20px;
       }
       .left-header span {
-          display: inline; /* Rétablir le titre sur les écrans plus larges */
+          display: inline;
       }
       .card img {
           max-height: 200px;
@@ -292,10 +301,16 @@
     <button id="backBtn">Retour</button>
     <h2 id="storyTitle"></h2>
     <img id="storyImg" alt="Image histoire">
+    
+    <div id="details-rating-info">
+        Moyenne générale : <strong id="averageRatingDisplay"></strong>
+    </div>
+
     <div style="text-align: center;">
-        <p><strong>Votre notation :</strong></p>
+        <p><strong>Votre notation locale :</strong></p>
         <div id="ratingStars" class="star-rating"></div>
     </div>
+    
     <div id="storyContent" style="white-space: pre-line; line-height: 1.5;"></div>
 </div>
 
@@ -342,7 +357,12 @@ const stories = [
 ];
 
 let favoris = JSON.parse(localStorage.getItem("favoris")) || [];
+// ratings: { storyId: [note1, note2, ...], 2: [5, 4, 5], ... }
+// Pour simuler la moyenne de plusieurs personnes, nous utiliserons un tableau de notes.
 let ratings = {};
+
+// Ceci simule l'ID unique de l'utilisateur (le navigateur).
+const USER_ID = 'local_user';
 
 function loadRatings() {
     try {
@@ -354,6 +374,11 @@ function loadRatings() {
         console.error("Erreur lors du chargement des notations:", e);
         ratings = {};
     }
+    
+    // Initialisation des notes de l'utilisateur local si elles n'existent pas
+    if (!ratings[USER_ID]) {
+        ratings[USER_ID] = {};
+    }
 }
 
 function saveRatings() {
@@ -361,23 +386,75 @@ function saveRatings() {
 }
 
 function getAverageRating(storyId) {
-    const storyRatings = ratings[storyId] || [];
-    if (storyRatings.length === 0) return 0;
-    const sum = storyRatings.reduce((acc, curr) => acc + curr, 0);
-    return (sum / storyRatings.length).toFixed(1);
+    const allRatings = [];
+
+    // Parcourir TOUS les utilisateurs (dans ce cas, juste 'local_user' et les notes historiques simplifiées)
+    // Ici, nous faisons l'hypothèse simplifiée que toutes les entrées dans `ratings[storyId]` représentent des notes données.
+    
+    // Récupérer toutes les notes stockées pour cette histoire, peu importe qui les a données.
+    // Pour cet exercice, nous allons utiliser le tableau stocké sous l'ID de l'histoire.
+    // Note: Pour une moyenne réelle multi-utilisateurs, vous auriez besoin d'un serveur et d'une BDD.
+    
+    // Pour simuler la moyenne, nous allons inclure la note de l'utilisateur local plus les notes historiques
+    // (qui représentent les notes des "autres" utilisateurs).
+    
+    // Note locale de l'utilisateur (si elle existe)
+    if (ratings[USER_ID] && ratings[USER_ID][storyId]) {
+        allRatings.push(ratings[USER_ID][storyId]);
+    }
+    
+    // Si des notes historiques existent (simulées par d'anciennes notes dans le même tableau)
+    // Pour les besoins de cet exercice, nous allons simplement créer une petite base de données fictive
+    // de 5 notes par histoire pour avoir une moyenne. 
+    
+    // --- Logique simplifiée pour simuler une "moyenne générale" ---
+    // Si une histoire n'a qu'une note (celle de l'utilisateur local), elle ne devrait pas être très biaisée.
+    // Créons une base de fausses notes pour illustrer la moyenne.
+    const historicalRatings = {
+        1: [4, 5, 3, 4], 
+        2: [5, 5, 4, 5],
+        3: [2, 3],
+        4: [4, 4, 5],
+        5: [3, 4, 3],
+        6: [5, 5]
+    };
+
+    let totalSum = 0;
+    let totalCount = 0;
+
+    // 1. Ajouter les notes historiques
+    const history = historicalRatings[storyId] || [];
+    totalSum += history.reduce((acc, curr) => acc + curr, 0);
+    totalCount += history.length;
+
+    // 2. Ajouter la note locale (si elle n'est pas déjà dans l'historique et qu'elle est définie)
+    const localRating = ratings[USER_ID] ? ratings[USER_ID][storyId] : null;
+    if (localRating !== null) {
+        totalSum += localRating;
+        totalCount += 1;
+    }
+    // Si localRating existe, il devrait être considéré comme la note de l'utilisateur
+    // Sinon, on affiche seulement la moyenne historique.
+    
+    // Calcul de la moyenne
+    if (totalCount === 0) return { avg: 0, count: 0 };
+    
+    const avg = totalSum / totalCount;
+    return { avg: avg.toFixed(1), count: totalCount };
 }
 
-function renderStars(storyId, containerId, userRating = 0) {
+function renderStars(storyId, containerId, currentRating) {
     const container = document.getElementById(containerId);
     container.innerHTML = "";
     
+    // On affiche l'étoile pleine si i est inférieur ou égal à la note (en direction RTL)
     for (let i = 5; i >= 1; i--) {
         const span = document.createElement("span");
         span.dataset.value = i;
         span.title = i + " étoiles";
         span.onclick = () => setRating(storyId, i);
 
-        if (i <= userRating) {
+        if (i <= currentRating) {
             span.classList.add('rated');
         }
         
@@ -386,15 +463,22 @@ function renderStars(storyId, containerId, userRating = 0) {
 }
 
 function setRating(storyId, value) {
-    if (!ratings[storyId]) {
-        ratings[storyId] = [];
+    // Enregistre la note de cet utilisateur ('local_user') pour cette histoire.
+    if (!ratings[USER_ID]) {
+        ratings[USER_ID] = {};
     }
-    
-    ratings[storyId][0] = value; 
+    ratings[USER_ID][storyId] = value; 
     
     saveRatings();
     
-    renderStars(storyId, 'ratingStars', value);
+    // Mettre à jour l'affichage de la note locale et la moyenne générale
+    const localRating = ratings[USER_ID] ? ratings[USER_ID][storyId] : 0;
+    renderStars(storyId, 'ratingStars', localRating);
+    
+    const { avg, count } = getAverageRating(storyId);
+    document.getElementById("averageRatingDisplay").innerText = `${avg} / 5 (${count} avis)`;
+
+    // Mettre à jour la vue principale (pour la carte)
     renderMain();
 }
 
@@ -407,14 +491,16 @@ function renderMain(list = stories) {
     main.innerHTML = "";
 
     list.forEach(story => {
-        const avgRating = getAverageRating(story.id);
+        const { avg, count } = getAverageRating(story.id);
+        const ratingText = avg > 0 ? `⭐ ${avg} / 5 (${count} avis)` : 'Pas encore noté';
+        
         const card = document.createElement("div");
         card.className = "card";
         card.innerHTML = `
             <img src="${story.img}" alt="${story.title}">
             <h3>${story.title}</h3>
             <div class="rating-display">
-                ${avgRating > 0 ? '⭐ ' + avgRating + ' / 5' : 'Pas encore noté'}
+                ${ratingText}
             </div>
             <button class="fav-btn ${favoris.includes(story.id) ? 'active' : ''}" onclick="toggleFavoris(${story.id}); event.stopPropagation();">❤ Favori</button>
         `;
@@ -432,8 +518,13 @@ function showStory(id) {
     document.getElementById("storyImg").src = story.img;
     document.getElementById("storyContent").innerText = story.text;
     
-    const userRating = ratings[id] ? ratings[id][0] : 0; 
-    renderStars(id, 'ratingStars', userRating);
+    // Afficher la moyenne générale
+    const { avg, count } = getAverageRating(id);
+    document.getElementById("averageRatingDisplay").innerText = `${avg} / 5 (${count} avis)`;
+    
+    // Afficher la note locale de l'utilisateur pour l'interactivité
+    const localRating = ratings[USER_ID] ? ratings[USER_ID][id] || 0 : 0; 
+    renderStars(id, 'ratingStars', localRating);
 }
 
 function toggleFavoris(id) {
@@ -457,4 +548,3 @@ renderMain();
 
 </body>
 </html>
-
